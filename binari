@@ -1,0 +1,37 @@
+
+ #function to convert decimal to binaryes/decimal_to_binary.py
+def decimal_to_binary(num):
+    if num < 0:
+       num= bin(num)
+
+    elif num == 0:
+        return "0"
+    else:
+        binary = bin(num)[2:]
+        print(f"The binary representation of {num} is: {binary}")
+
+
+#main function to run the conversion
+num=int(input("Enter a number:"))
+binary=decimal_to_binary(num)  
+ 
+def to_binary(num, bits):
+    return format(num, f'0{bits}b')
+
+def twos_complement(binary_str):
+    flipped = ''.join('1' if b == '0' else '0' for b in binary_str)
+    as_number = int(flipped, 2) + 1
+    return format(as_number, f'0{len(binary_str)}b')
+
+def to_decimal(binary_str):
+    return int(binary_str, 2)
+
+# --- התחלת התוכנית ---
+num = int(input("הכנס מספר עשרוני חיובי: "))
+bits = int(input("הכנס מספר ביטים (למשל 8): "))
+
+binary = to_binary(num, bits)
+twos = twos_complement(binary)
+decimal_result = to_decimal(twos)
+
+print(decimal_result)
