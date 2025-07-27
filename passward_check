@@ -1,0 +1,27 @@
+  
+
+password = input("Please enter your password: ")
+count = 0
+if len(password) >= 8 and len(password) <= 11:
+    count += 1
+    if len(password) >= 12:
+        count += 2
+    not_common = password.lower() not in ["password", "123456", "1234", "abcdef", "password123", "abc123", "admin"]
+    if not_common == False:
+        count -= 2
+    if any(c.islower() for c in password):
+        count += 1 
+    if any(c.isupper() for c in password):
+        count += 1
+    if any(c.isdigit() for c in password):
+        count += 1   
+    if any(c in "!@#$%^&*()-_=+[]{}|;:,.<>?/" for c in password):
+        count += 1
+    if count <= 0:
+        print("Password is too weak, you are recommanded to try again.")
+    if count >= 1 and count <= 3:
+        print("Password is medium, you are recommanded to try again.")
+    if count >= 4:
+        print("Password is strong and created successfully!")
+        
+     
