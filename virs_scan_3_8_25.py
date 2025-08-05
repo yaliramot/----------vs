@@ -1,15 +1,19 @@
+# virs_scan_3_8_25.py
 import os
 import requests
-
-response = requests.get("https://example.com")
-print(response.status_code)
-
-import requests
+import tkinter as tk
 import time
+
 virus_total_api_key = "606bbbd5f972fb43b113307beb576e6a2a201b5c9fca34d6ccf4fc6c207df871"
 
-
 def iterate_files(folder_path):
+    if not folder_path.strip():  # בדיקה אם המחרוזת ריקה או רווחים בלבד
+        print("Error: No folder path specified.")
+        return
+    if not os.path.exists(folder_path):
+        print(f"Error: The folder path does not exist: {folder_path}")
+        return
+
     for filename in os.listdir(folder_path):
         full_path = os.path.join(folder_path, filename)
 
@@ -27,14 +31,12 @@ def scan_file(file_path):
         if is_virus:
             print("VIRUS DETECTED!!! Filepath: ", file_path)
         else:
-            print("{} is not virus".format(file_path))
+            print("{} is not a virus".format(file_path))
     else:
         print("Unexpected response, no scan id found for file: ", file_path)
 
-
 def upload_file(file_path):
     url = 'https://www.virustotal.com/vtapi/v2/file/scan'
-
     params = {'apikey': virus_total_api_key}
 
     file_content = open(file_path, 'rb')
@@ -44,36 +46,42 @@ def upload_file(file_path):
     response = requests.post(url, files=files, params=params)
     return response.json()
 
-
 def get_report(scan_id):
-    print("getting report for scan id", scan_id)
+    print("Getting report for scan id", scan_id)
     url = 'https://www.virustotal.com/vtapi/v2/file/report'
-
     params = {'apikey': virus_total_api_key, 'resource': scan_id}
 
     response = requests.get(url, params=params)
     if not response:
-        raise Exception("Unexecpred Error in response")
-    
-    if response.status_code == 200: # Received good response
+        raise Exception("Unexpected Error in response")
+
+    if response.status_code == 200:
         response = response.json()
-        if response.get('response_code') != 1: # Scan not completed
+        if response.get('response_code') != 1:
             print("Scan not completed...")
             time.sleep(5)
-            get_report(scan_id)
+            return get_report(scan_id)
         else:
             return response.get("positives") > 0
-    elif response.status_code == 204: # Received response without content
+    elif response.status_code == 204:
         print("Empty response...")
         time.sleep(5)
-        get_report(scan_id)
-    else: # Received unexecpted response
+        return get_report(scan_id)
+    else:
         print("Received unexpected response with status code:", response.status_code)
         return False
 
+# GUI setup
+root = tk.Tk()
+root.title("Virus Scan")
 
-def main():
-    iterate_files("C://Users//yalir//OneDrive//Desktop//פרוייקטים vs")
+entry = tk.Entry(root, width=50)
+entry.pack(pady=10)
 
-if __name__ == "__main__":
-    main()
+button = tk.Button(root, text="Scan Folder", command=lambda: iterate_files(entry.get()))
+button.pack(pady=5)
+
+output_label = tk.Label(root, text="")
+output_label.pack(pady=10)
+
+root.mainloop()
